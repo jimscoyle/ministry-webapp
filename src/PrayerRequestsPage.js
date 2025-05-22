@@ -9,79 +9,96 @@ function PrayerRequestsPage({
   user, userName, role
 }) {
   return (
-    <div>
-      <h2>Prayer Requests</h2>
-      <form onSubmit={handleAddPrayerRequest}>
+    <div className="container mt-4">
+      <h2 className="mb-4">Prayer Requests</h2>
+      <form className="d-flex mb-4 gap-2" onSubmit={handleAddPrayerRequest}>
         <input
           value={prayerText}
           onChange={e => setPrayerText(e.target.value)}
           placeholder="Enter prayer request"
-          style={{ width: "75%", marginRight: 8 }}
+          className="form-control"
         />
-        <button type="submit">Add</button>
+        <button type="submit" className="btn btn-primary">
+          Add
+        </button>
       </form>
-      <ul style={{ marginTop: 24 }}>
+      <ul className="list-group">
         {prayerRequests.map(req => (
-          <li key={req.id} style={{ marginBottom: 18 }}>
+          <li key={req.id} className="list-group-item mb-3">
             {editingId === req.id ? (
-              <>
+              <div className="d-flex align-items-center gap-2">
                 <input
                   value={editingText}
                   onChange={e => setEditingText(e.target.value)}
-                  style={{ width: "60%" }}
+                  className="form-control"
+                  style={{ maxWidth: 350 }}
                 />
-                <button onClick={() => handleEditPrayerRequest(req.id)} style={{ marginLeft: 8 }}>Save</button>
-                <button onClick={() => setEditingId(null)} style={{ marginLeft: 4 }}>Cancel</button>
-              </>
+                <button onClick={() => handleEditPrayerRequest(req.id)} className="btn btn-success btn-sm">
+                  Save
+                </button>
+                <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-sm">
+                  Cancel
+                </button>
+              </div>
             ) : (
               <>
-                <b>{req.text}</b> <span style={{ color: "#999" }}>— {req.createdByName}</span>
+                <div className="d-flex align-items-center justify-content-between">
+                  <div>
+                    <b>{req.text}</b>
+                    <span className="text-muted ms-2">— {req.createdByName}</span>
+                  </div>
+                  {(user && (role === "admin" || role === "pastor" || user.uid === req.createdBy)) && (
+                    <div className="btn-group">
+                      <button
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() => { setEditingId(req.id); setEditingText(req.text); }}>
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleDeletePrayerRequest(req.id)}>
+                        Delete
+                      </button>
+                      {req.status !== "answered" && (
+                        <>
+                          <button
+                            className="btn btn-outline-success btn-sm"
+                            onClick={() =>
+                              setShowAnsweredId(showAnsweredId === req.id ? null : req.id)
+                            }
+                          >
+                            Mark as Answered
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
                 {req.status === "answered" && (
-                  <div style={{ color: "green", marginTop: 4 }}>
+                  <div className="alert alert-success mt-2 py-2 px-3">
                     <strong>Answered:</strong> {req.answeredNote}
                   </div>
                 )}
-                {(user && (role === "admin" || role === "pastor" || user.uid === req.createdBy)) && (
-                  <div style={{ marginTop: 4 }}>
-                    <button onClick={() => { setEditingId(req.id); setEditingText(req.text); }}>
-                      Edit
+                {showAnsweredId === req.id && (
+                  <div className="mt-2 d-flex align-items-center gap-2">
+                    <input
+                      value={answeredNotes[req.id] || ""}
+                      onChange={e =>
+                        setAnsweredNotes({ ...answeredNotes, [req.id]: e.target.value })
+                      }
+                      placeholder="How was it answered?"
+                      className="form-control"
+                      style={{ maxWidth: 250 }}
+                    />
+                    <button
+                      className="btn btn-success btn-sm"
+                      onClick={() => {
+                        handleMarkAsAnswered(req.id, answeredNotes[req.id] || "");
+                        setShowAnsweredId(null);
+                      }}
+                    >
+                      Save
                     </button>
-                    <button onClick={() => handleDeletePrayerRequest(req.id)} style={{ marginLeft: 8 }}>
-                      Delete
-                    </button>
-                    {req.status !== "answered" && (
-                      <>
-                        <button
-                          style={{ marginLeft: 8 }}
-                          onClick={() =>
-                            setShowAnsweredId(showAnsweredId === req.id ? null : req.id)
-                          }
-                        >
-                          Mark as Answered
-                        </button>
-                        {showAnsweredId === req.id && (
-                          <span style={{ marginLeft: 8 }}>
-                            <input
-                              value={answeredNotes[req.id] || ""}
-                              onChange={e =>
-                                setAnsweredNotes({ ...answeredNotes, [req.id]: e.target.value })
-                              }
-                              placeholder="How was it answered?"
-                              style={{ width: 150 }}
-                            />
-                            <button
-                              onClick={() => {
-                                handleMarkAsAnswered(req.id, answeredNotes[req.id] || "");
-                                setShowAnsweredId(null);
-                              }}
-                              style={{ marginLeft: 4 }}
-                            >
-                              Save
-                            </button>
-                          </span>
-                        )}
-                      </>
-                    )}
                   </div>
                 )}
               </>

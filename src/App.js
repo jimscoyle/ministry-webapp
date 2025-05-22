@@ -368,7 +368,7 @@ function App() {
   return (
     <div className="container-lg py-4">
       <Header />
-      <NavBar user={user} role={role} handleLogout={handleLogout} />
+      <NavBar user={user} role={role} userName={userName} handleLogout={handleLogout} />
       <Routes>
         <Route
           path="/"

@@ -366,7 +366,7 @@ function App() {
 
   // UI
   return (
-    <div className="App" style={{ maxWidth: 480, margin: "auto", padding: 20 }}>
+    <div className="container-lg py-4">
       <Header />
       <NavBar user={user} role={role} handleLogout={handleLogout} />
       <Routes>
